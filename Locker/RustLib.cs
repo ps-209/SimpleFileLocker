@@ -11,10 +11,7 @@ namespace SimpleFileLocker.Locker
     {
         private const string DllPath = "simple_file_locker.dll";
 
-        [DllImport("simple_file_locker.dll",
-        EntryPoint = "simple_file", // dumpbin에서 확인한 이름 그대로 입력
-        CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)]
+        [DllImport("simple_file_locker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int simple_file(string mode, string filePath, string password, string protection);
     }
 }

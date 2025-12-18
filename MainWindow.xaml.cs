@@ -30,11 +30,23 @@ namespace SimpleFileLocker
             add_item_on_mode_box();
         }
         public void add_item_on_mode_box()
+        {
+            mode_box.Items.Add("Lock");
+            mode_box.Items.Add("Unlock");
+            mode_box.SelectedIndex = 0;
+        }
+        public void mode_box_changed(object sender, EventArgs e)
+        {
+            string selected = mode_box.Text.ToLower();
+            if (selected == "unlock")
             {
-                mode_box.Items.Add("Lock");
-                mode_box.Items.Add("Unlock");
-                mode_box.SelectedIndex = 0;
+                protect_group.IsEnabled = true;
             }
+            else if (selected == "lock")
+            {
+                protect_group.IsEnabled = false;
+            }
+        }
         private void Open_button_clicked(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -83,10 +95,14 @@ namespace SimpleFileLocker
                         break;
                 }
             }
+            else
+            {
+                HandyControl.Controls.Growl.Warning("설정값이 부족합니다.");
+            }
         }
         private void Help_button_clicked(object sender, RoutedEventArgs e)
         {
-            HandyControl.Controls.Growl.Info("1. Open버튼을 통해 파일을 선택\n2. 비밀번호입력과 잠금/해제 기능 중 선택\n3. 보호기능 선택 & 실행");
+            HandyControl.Controls.Growl.Info("1. Open버튼을 통해 파일을 선택\n2. 비번입력과 잠금/해제 기능 중 선택\n3. 보호기능 선택 & 실행");
 
         }
         private string CheckStatus()
