@@ -1,4 +1,7 @@
-﻿using HandyControl.Tools;
+﻿using HandyControl.Data;
+using HandyControl.Themes;
+using HandyControl.Tools;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -18,8 +21,7 @@ namespace SimpleFileLocker
         {
             base.OnStartup(e);
 
-            // HandyControl의 언어를 한국어로 설정
-            ConfigHelper.Instance.SetLang("ko");
+            
         }
     }
 }

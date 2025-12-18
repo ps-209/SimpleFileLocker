@@ -1,4 +1,4 @@
-﻿<Window
+﻿<hc:Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:SimpleFileLocker"
         xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="SimpleFileLocker.MainWindow"
         mc:Ignorable="d"
-        Title="SimpleFileLocker v1.0.1" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Height="335" Width="560">
+        Title="SimpleFileLocker v1.0.2" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Height="335" Width="560"
+        Background="{DynamicResource RegionBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}">
     <Grid Height="320" VerticalAlignment="Top">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -23,8 +25,6 @@
             <RadioButton x:Name="protect_off" Content="Off" IsChecked="True" Margin="0,0,0,0"/>
         </hc:ButtonGroup>
         <Button Content="Start" x:Name="start_button" Click="Start_button_clicked" FontSize="15" Margin="0,220,0,0" VerticalAlignment="Top" Height="60" Width="200"/>
-        <Button x:Name="help_button" Click="Help_button_clicked" Width="35" Height="35" HorizontalAlignment="Left" Margin="10,255,0,0" VerticalAlignment="Top">
-            <Image Source="/Image/question_icon.png" Width="35"/>
-        </Button>
+        <Button Content="?" x:Name="help_button" Click="Help_button_clicked" FontSize="15" FontWeight="Bold" Width="30" Height="30" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="10,265,0,0" VerticalAlignment="Top"/>
     </Grid>
-</Window>
+</hc:Window>

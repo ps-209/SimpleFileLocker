@@ -32,7 +32,6 @@
 	<Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
-    <Resource Include="Image\question_icon.png" />
     <PackageReference Include="HandyControl" Version="3.5.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
