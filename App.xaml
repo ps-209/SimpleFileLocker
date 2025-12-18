@@ -9,12 +9,15 @@
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Button" BasedOn="{StaticResource ButtonDefault}">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="RoyalBlue"/>
+                        <Setter Property="Foreground" Value="RoyalBlue"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
 
-            <System:String x:Key="Confirm">확인</System:String>
-            <System:String x:Key="Cancel">취소</System:String>
-            <System:String x:Key="Yes">예</System:String>
-            <System:String x:Key="No">아니오</System:String>
-            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using HandyControl;
+using HandyControl.Controls;
+using Microsoft.Win32;
+using SimpleFileLocker.Locker;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using HandyControl;
-using Microsoft.Win32;
-using SimpleFileLocker.Locker;
+using Window = System.Windows.Window;
 
 namespace SimpleFileLocker
 {
@@ -53,7 +55,7 @@ namespace SimpleFileLocker
 
             // 2. 옵션 설정 (선택 사항)
             openFileDialog.Title = "파일을 선택해 주세요"; // 창 제목
-            openFileDialog.Filter = "모든 파일 (*.*)|*.*|텍스트 파일 (*.txt)|*.txt|이미지 (*.jpg;*.png)|*.jpg;*.png"; // 확장자 필터
+            openFileDialog.Filter = "텍스트 파일 (*.txt)|*.txt*.*|모든 파일 (*.*)|"; // 확장자 필터
             openFileDialog.InitialDirectory = @"C:\"; // 초기 열리는 폴더 경로
 
             // 3. 창 띄우고 결과 받기
@@ -76,22 +78,22 @@ namespace SimpleFileLocker
                 switch (result)
                 {
                     case 0:
-                        HandyControl.Controls.Growl.Info("성공적으로 완료했습니다.");
+                        HandyControl.Controls.Growl.Success("성공적으로 완료했습니다.");
                         break;
                     case 1:
-                        HandyControl.Controls.Growl.Warning("암호화에 실패했습니다.");
+                        HandyControl.Controls.Growl.Error("암호화에 실패했습니다.");
                         break;
                     case 2:
-                        HandyControl.Controls.Growl.Warning("파일 읽기에 실패했습니다.");
+                        HandyControl.Controls.Growl.Error("파일 읽기에 실패했습니다.");
                         break;
                     case 3:
-                        HandyControl.Controls.Growl.Warning("복호화에 실패했습니다.");
+                        HandyControl.Controls.Growl.Error("복호화에 실패했습니다.");
                         break;
                     case 4:
                         HandyControl.Controls.Growl.Warning("이미 적용된 파일입니다.");
                         break;
                     default:
-                        HandyControl.Controls.Growl.Warning("모드 선택 오류가 발생했습니다.");
+                        HandyControl.Controls.Growl.Fatal("기타 오류가 발생했습니다.");
                         break;
                 }
             }
