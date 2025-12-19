@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:SimpleFileLocker"
         xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="SimpleFileLocker.MainWindow"
         mc:Ignorable="d"
-        Title="SimpleFileLocker v1.0.2" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Height="335" Width="560"
+        Title="SimpleFileLocker v1.0.3" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Height="335" Width="560"
         Background="{DynamicResource RegionBrush}"
-        Foreground="{DynamicResource PrimaryTextBrush}">
+        Foreground="{DynamicResource PrimaryTextBrush}" Closing="Window_Closing">
     <Grid Height="320" VerticalAlignment="Top">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

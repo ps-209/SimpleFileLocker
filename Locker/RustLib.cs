@@ -11,7 +11,7 @@ namespace SimpleFileLocker.Locker
     {
         private const string DllPath = "simple_file_locker.dll";
 
-        [DllImport("simple_file_locker.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int simple_file(string mode, string filePath, string password, string protection);
+        [DllImport("simple_file_locker", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern int simple_file(string mode, byte[] filePath, string password, string protection);
     }
 }

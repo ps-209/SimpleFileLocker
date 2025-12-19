@@ -7,6 +7,8 @@ using Microsoft.Win32;
 using SimpleFileLocker.Locker;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -29,14 +31,17 @@ namespace SimpleFileLocker
     /// </summary>
     public partial class MainWindow : Window
     {
-        bool ProcessWorking = false;
+        public bool ProcessWorking = false;
+        
+
         public MainWindow()
         {
             
             InitializeComponent();
             add_item_on_mode_box();
-            
+        
         }
+
         public void add_item_on_mode_box()
         {
             mode_box.Items.Add("Lock");
@@ -72,48 +77,65 @@ namespace SimpleFileLocker
             }
         }
         
-        private void Start_button_clicked(object sender, RoutedEventArgs e) //실행
+        private async void Start_button_clicked(object sender, RoutedEventArgs e) //실행
         {
             if(ProcessWorking)
             {
-                Growl.Warning(new GrowlInfo { Message = "이미 작업이 실행중입니다.", ShowDateTime = false });
                 return;
             }
             string mode = mode_box.Text.ToLower();
+
             string path = dir_box.Text;
+            byte[] pathBytes = Encoding.UTF8.GetBytes(path + "\0");
+
             string password = password_box.Password;
             string protect = CheckStatus();
             if (mode != "" && path != "" && protect != "")
             {
-                int result = RustLib.simple_file(mode, path, password, protect);
-                switch (result)
+                ProcessWorking = true;
+                start_button.IsEnabled = false;
+                try
                 {
-                    case 0:
-                        Growl.Success(new GrowlInfo { Message = "성공적으로 완료했습니다.", ShowDateTime = false });
-                        break;
-                    case 1:
-                        Growl.Error(new GrowlInfo { Message = "암호화에 실패했습니다.", ShowDateTime = false });
-                        break;
-                    case 2:
-                        Growl.Error(new GrowlInfo { Message = "파일 읽기에 실패했습니다.", ShowDateTime = false });
-                        break;
-                    case 3:
-                        Growl.Error(new GrowlInfo { Message = "복호화에 실패했습니다.", ShowDateTime = false });
-                        break;
-                    case 4:
-                        Growl.Warning(new GrowlInfo { Message = "이미 적용된 파일입니다.", ShowDateTime = false });
-                        break;
-                    default:
-                        Growl.Fatal(new GrowlInfo { Message = "기타오류가 발생했습니다.", ShowDateTime = false });
-                        break;
+                    int result = await Task.Run(() => RustLib.simple_file(mode, pathBytes, password, protect));
+                    switch (result)
+                    {
+                        case 0:
+                            Growl.Success(new GrowlInfo { Message = "성공적으로 완료했습니다.", ShowDateTime = false });
+                            break;
+                        case 1:
+                            Growl.Error(new GrowlInfo { Message = "암호화에 실패했습니다.", ShowDateTime = false });
+                            break;
+                        case 2:
+                            Growl.Error(new GrowlInfo { Message = "파일 읽기에 실패했습니다.", ShowDateTime = false });
+                            break;
+                        case 3:
+                            Growl.Error(new GrowlInfo { Message = "복호화에 실패했습니다.", ShowDateTime = false });
+                            break;
+                        case 4:
+                            Growl.Warning(new GrowlInfo { Message = "이미 적용된 파일입니다.", ShowDateTime = false });
+                            break;
+                        default:
+                            Growl.Fatal(new GrowlInfo { Message = "기타오류가 발생했습니다.", ShowDateTime = false });
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Growl.Fatal(new GrowlInfo { Message = "작업오류가 발생했습니다.", ShowDateTime = false });
+                    //int result = RustLib.simple_file(mode, path, password, protect);
+                }
+                finally
+                {
+                    ProcessWorking = false;
+                    start_button.IsEnabled = true;
                 }
             }
             else
             {
                 Growl.Warning(new GrowlInfo { Message = "설정 값이 부족합니다.", ShowDateTime = false });
+                start_button.IsEnabled = true;
+                ProcessWorking = false;
             }
-            
-            ProcessWorking = false;
         }
         private void Help_button_clicked(object sender, RoutedEventArgs e)
         {
@@ -134,6 +156,19 @@ namespace SimpleFileLocker
             {
                 return "off";
             }
+        }
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (ProcessWorking)
+            {
+                Growl.Warning(new GrowlInfo { Message = "작업이 진행 중입니다.", ShowDateTime = false });
+                e.Cancel = true;
+            }
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Environment.Exit(0);
         }
     }
 }
