@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SimpleFileLocker"
         xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="SimpleFileLocker.MainWindow"
         mc:Ignorable="d"
-        Title="SimpleFileLocker v1.0.3" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Height="335" Width="560"
+        Title="SimpleFileLocker v1.0.4" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Height="335" Width="560"
         Background="{DynamicResource RegionBrush}"
         Foreground="{DynamicResource PrimaryTextBrush}" Closing="Window_Closing">
     <Grid Height="320" VerticalAlignment="Top">
@@ -14,13 +14,21 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <hc:Divider Content="File" Margin="20,0,20,290" Grid.ColumnSpan="2" Height="20"/>
-        <Button Content="Open" x:Name="open_button" Click="Open_button_clicked" Margin="10,0,0,257" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="80"/>
-        <TextBox hc:InfoElement.Placeholder="C:\example\files\a.txt" x:Name="dir_box" FontFamily="Consolas" Style="{StaticResource TextBoxExtend}" HorizontalAlignment="Left" Margin="90,0,0,257" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Width="431"/>
+        
+        <Grid Height="35" Width="520" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,257">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <hc:TextBox x:Name="dir_box" Text="" hc:InfoElement.Placeholder="C:\example\files\a.txt" AllowDrop="False" IsReadOnly="True" FontFamily="Consolas" Style="{StaticResource TextBoxExtend}" BorderThickness="1" hc:BorderElement.CornerRadius="4,0,0,4"/>
+            <Button Grid.Column="1" x:Name="open_button" Content="Open" Click="Open_button_clicked" Height="35" Width="78" Margin="-1,0,0,0" hc:BorderElement.CornerRadius="0,4,4,0"/>
+        </Grid>
+        
         <hc:Divider Content="Password + Mode" Margin="20,0,20,230" Grid.ColumnSpan="2" Height="20" VerticalAlignment="Bottom"/>
         <hc:PasswordBox x:Name="password_box" hc:InfoElement.ShowClearButton="True" HorizontalAlignment="Left" Margin="40,0,0,195" VerticalAlignment="Bottom" Width="180"/>
         <ComboBox x:Name="mode_box" SelectionChanged="mode_box_changed" HorizontalAlignment="Left" Margin="340,0,0,195" VerticalAlignment="Bottom" Width="180"/>
-        <hc:Divider Content="Protection" Margin="20,135,20,0" Height="20" VerticalAlignment="Top"/>
-        <hc:ButtonGroup x:Name ="protect_group" Margin="10,165,10,0">
+        <hc:Divider Content="Data Concealment" Margin="20,135,20,0" Height="20" VerticalAlignment="Top"/>
+        <hc:ButtonGroup x:Name ="protect_group" Margin="20,165,20,0">
             <RadioButton x:Name="protect_on" Content="On" Margin="0,0,0,0"/>
             <RadioButton x:Name="protect_off" Content="Off" IsChecked="True" Margin="0,0,0,0"/>
         </hc:ButtonGroup>

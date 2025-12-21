@@ -9,7 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -18,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -31,7 +35,8 @@ namespace SimpleFileLocker
     /// </summary>
     public partial class MainWindow : Window
     {
-        public bool ProcessWorking = false;
+        public bool ProcessWorking = false; //작동중인지
+        public bool IsNTFS = false; //선택한 파일이 NTFS시스템 파일인지
         
 
         public MainWindow()
@@ -39,7 +44,7 @@ namespace SimpleFileLocker
             
             InitializeComponent();
             add_item_on_mode_box();
-        
+            
         }
 
         public void add_item_on_mode_box()
@@ -50,14 +55,24 @@ namespace SimpleFileLocker
         }
         public void mode_box_changed(object sender, EventArgs e)
         {
-            string selected = mode_box.Text.ToLower();
+            string selected = mode_box.SelectedItem.ToString().ToLower();
             if (selected == "unlock")
             {
-                protect_group.IsEnabled = true;
+                protect_group.IsEnabled = false;
+                // 안내를 위해 기본값을 유지하거나 특정 상태로 고정할 수 있습니다.
             }
+            // 2. Lock 모드: NTFS 시스템일 때만 활성화하여 선택권 부여
             else if (selected == "lock")
             {
-                protect_group.IsEnabled = false;
+                if (IsNTFS)
+                {
+                    protect_group.IsEnabled = true;
+                }
+                else
+                {
+                    protect_group.IsEnabled = false;
+                    protect_off.IsChecked = true; // NTFS가 아니면 강제로 Off
+                }
             }
         }
         private void Open_button_clicked(object sender, RoutedEventArgs e)
@@ -74,6 +89,7 @@ namespace SimpleFileLocker
             if (openFileDialog.ShowDialog() == true)
             {
                 dir_box.Text = openFileDialog.FileName;
+                CheckDrive(dir_box.Text);
             }
         }
         
@@ -139,8 +155,10 @@ namespace SimpleFileLocker
         }
         private void Help_button_clicked(object sender, RoutedEventArgs e)
         {
-            Growl.Info(new GrowlInfo { Message = "1. Open버튼을 통해 파일을 선택\n2. 비번입력과 잠금/해제 기능 중 선택\n3. 보호기능 선택 & 실행", ShowDateTime = false });
-
+            string msi2 = "데이터 은닉기능은 NTFS파일 시스템에서만 작동합니다.\n클라우드나 USB이동시에는 파일 데이터가 삭제될 수 있습니다.";
+            Growl.Warning(new GrowlInfo { Message = msi2, ShowDateTime = false });
+            string msi = "1. Open버튼을 통해 파일을 선택\n2. 비번입력과 잠금/해제 기능 중 선택\n3. 데이터 은닉기능 선택 & 실행";
+            Growl.Info(new GrowlInfo { Message = msi, ShowDateTime = false });
         }
         private string CheckStatus()
         {
@@ -157,11 +175,68 @@ namespace SimpleFileLocker
                 return "off";
             }
         }
+        private void CheckDrive(string path)
+        {
+            if (path.StartsWith(@"\\"))
+            {
+                string msi = "네트워크 경로는 지원하지 않습니다.";
+                Growl.Warning(new GrowlInfo { Message = msi, ShowDateTime = false });
+                dir_box.Text = "";
+                return;
+            }
+            try
+            {
+                string driveRoot = System.IO.Path.GetPathRoot(path);
+                if (string.IsNullOrEmpty(driveRoot))
+                {
+                    string msi = "유효하지 않은 파일 경로입니다.";
+                    Growl.Warning(new GrowlInfo { Message = msi, ShowDateTime = false });
+                    dir_box.Text = "";
+                    return;
+                }
+                DriveInfo drive = new DriveInfo(driveRoot);
+                if (drive.IsReady)
+                {
+                    string drive_format = drive.DriveFormat;
+                    if (drive.DriveType == DriveType.Network)
+                    {
+                        string msi = $"네트워크 드라이브를 지원하지 않습니다.\n드라이브 타입 : {drive_format}";
+                        Growl.Warning(new GrowlInfo { Message = msi, ShowDateTime = false });
+                        dir_box.Text = "";
+                        return;
+                    }
+                    IsNTFS = drive.DriveFormat.Equals("NTFS", StringComparison.OrdinalIgnoreCase);
+                    if(IsNTFS) //투명화 자동적용
+                    {
+                        protect_on.IsChecked = true;
+                        if (mode_box.Text.Equals("lock", StringComparison.OrdinalIgnoreCase)) //락에 놓고 선택시
+                        {
+                            protect_group.IsEnabled = true;
+                        }
+                    }
+                    else //Fat32등 다른 포맷시 버튼 비활성화 & 글씨 보이게
+                    {
+                        protect_group.IsEnabled = false;
+                        protect_off.IsChecked = true;
+                        string msi = $"NTFS 시스템이 아니므로 데이터 은닉 사용불가\n파일 형식 : {drive.DriveFormat}";
+                        Growl.Warning(new GrowlInfo { Message = msi, ShowDateTime = false });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                dir_box.Text = "";
+                string msi = $"드라이브 확인 중 오류\n{ex.Message}";
+                Growl.Warning(new GrowlInfo { Message = msi, ShowDateTime = false });
+            }
+         }
+       
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (ProcessWorking)
             {
-                Growl.Warning(new GrowlInfo { Message = "작업이 진행 중입니다.", ShowDateTime = false });
+                string msi = "작업이 진행 중입니다.";
+                Growl.Warning(new GrowlInfo { Message = msi, ShowDateTime = false });
                 e.Cancel = true;
             }
         }
